@@ -24,6 +24,7 @@ from .odvg import ODVGDataset
 from .openimages import OpenImagesChallengeDataset, OpenImagesDataset
 from .refcoco import RefCocoDataset
 from .reid_dataset import ReIDDataset
+from .trdm import TrdmDataset
 from .samplers import (AspectRatioBatchSampler, ClassAwareSampler,
                        CustomSampleSizeSampler, GroupMultiSourceSampler,
                        MultiSourceSampler, TrackAspectRatioBatchSampler,
@@ -49,5 +50,5 @@ __all__ = [
     'BaseSegDataset', 'ADE20KSegDataset', 'CocoSegDataset',
     'ADE20KInstanceDataset', 'iSAIDDataset', 'V3DetDataset', 'ConcatDataset',
     'ODVGDataset', 'MDETRStyleRefCocoDataset', 'DODDataset',
-    'CustomSampleSizeSampler', 'Flickr30kDataset'
+    'CustomSampleSizeSampler', 'Flickr30kDataset', 'TrdmDataset'
 ]
