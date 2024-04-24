@@ -38,6 +38,8 @@ model = dict(
         mask_thr_binary=0.5),
 )
 
+input_image_size = 640
+
 train_pipeline = [
     dict(type='LoadImageFromFile', backend_args={{_base_.backend_args}}),
     dict(
@@ -45,29 +47,9 @@ train_pipeline = [
         with_bbox=True,
         with_mask=True,
         poly2mask=False),
-    dict(
-        type='CachedMosaic',
-        img_scale=(640, 640),
-        pad_val=114.0,
-        max_cached_images=20,
-        random_pop=False),
-    dict(
-        type='RandomResize',
-        scale=(1280, 1280),
-        ratio_range=(1.0, 1.0),
-        keep_ratio=True),
-    dict(type='RandomCrop', crop_size=(640, 640)),
+    dict(type='Resize', scale=(input_image_size, input_image_size), keep_ratio=True),
     dict(type='YOLOXHSVRandomAug'),
     dict(type='RandomFlip', prob=0.5),
-    dict(type='Pad', size=(640, 640), pad_val=dict(img=(114, 114, 114))),
-    dict(
-        type='CachedMixUp',
-        img_scale=(640, 640),
-        ratio_range=(1.0, 1.0),
-        max_cached_images=10,
-        random_pop=False,
-        pad_val=(114, 114, 114),
-        prob=0.5),
     dict(type='FilterAnnotations', min_gt_bbox_wh=(1, 1)),
     dict(type='PackDetInputs')
 ]
@@ -92,8 +74,7 @@ train_dataloader = dict(
 
 test_pipeline = [
     dict(type='LoadImageFromFile', backend_args={{_base_.backend_args}}),
-    dict(type='Resize', scale=(640, 640), keep_ratio=True),
-    dict(type='Pad', size=(640, 640), pad_val=dict(img=(114, 114, 114))),
+    dict(type='Resize', scale=(input_image_size, input_image_size), keep_ratio=True),
     dict(type='LoadAnnotations', with_bbox=True),
     dict(
         type='PackDetInputs',
@@ -114,6 +95,10 @@ val_dataloader = dict(
 )
 test_dataloader = val_dataloader
 
+train_cfg = dict(
+    max_epochs=50,
+    val_interval=1)
+
 val_evaluator = dict(
     type='CocoMetric',
     ann_file=data_root+'/val.json',
@@ -123,3 +108,9 @@ test_evaluator = val_evaluator
 
 # val_evaluator = dict(type='SemSegMetric', iou_metrics=['mIoU'])
 # test_evaluator = val_evaluator
+
+default_hooks = dict(
+    checkpoint=dict(
+        interval=5,
+        max_keep_ckpts=3  # only keep latest 3 checkpoints
+    ))
